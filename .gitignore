@@ -1,5 +1,5 @@
 # drawio backup files
-*.drawio.bak
+*.drawio.bkp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
