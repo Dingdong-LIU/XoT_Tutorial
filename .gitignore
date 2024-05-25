@@ -1,3 +1,6 @@
+# langchain cache with SQLite
+.langchain_cache.db
+
 # drawio backup files
 *.drawio.bkp
 

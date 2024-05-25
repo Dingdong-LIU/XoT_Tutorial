@@ -52,6 +52,7 @@ May consider the chain-of-though prompting, with background and fewshot examples
 
 Fewshot examples:
 > Question: When did you purchase this item?
+> 
 > Reply: A month ago.
 > Analysis: Let's think step by step. All products come with a 90-day warranty. A month is within the 90-day time span. The product must have warranty.
 > Warranty: Yes.
@@ -59,6 +60,7 @@ Fewshot examples:
 
 > Question: When did you purchase this item?
 > Reply: Last year.
+> 
 > Analysis: Let's think step by step. All products come with a 90-day warranty. A year is more than this time span. However, we are not sure if the user purchased additional warranty. We are not sure if the product has warranty.
 > Warranty: Unsure.
 > Utterance: Did you purchase additional warranty?
