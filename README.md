@@ -59,8 +59,8 @@ Fewshot examples:
 > Utterance: Great! Your product has warranty.
 
 > Question: When did you purchase this item?
-> Reply: Last year.
 > 
+> Reply: Last year.
 > Analysis: Let's think step by step. All products come with a 90-day warranty. A year is more than this time span. However, we are not sure if the user purchased additional warranty. We are not sure if the product has warranty.
 > Warranty: Unsure.
 > Utterance: Did you purchase additional warranty?
