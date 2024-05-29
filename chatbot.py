@@ -8,7 +8,11 @@ from utils.tradein_strategy import tradein_parser, tradein_strategy_prompt
 from utils.plan_selection import plan_parser, plan_selection_prompt
 from utils.user_preference_module import preference_identifier_parser, preference_identifier_prompt
 from utils.question_generator import question_generator_parser, question_generator_prompt
-
+from utils.timebased_generator import (
+    get_time_contrain_of_plans,
+    time_aware_plan_parser,
+    time_aware_plan_selection_prompt,
+)
 
 import os
 from dotenv import load_dotenv
@@ -26,18 +30,18 @@ langchain.debug = False  # set verbose mode to True to show more execution detai
 load_dotenv()
 
 langchain_llm = AzureChatOpenAI(
-    azure_endpoint=os.getenv("YOUR_AZURE_ENDPOINT"),
-    api_key=os.getenv("AZURE_API_KEY"),
-    api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+    azure_endpoint=os.getenv("MY_AZURE_ENDPOINT"),
+    api_key=os.getenv("MY_AZURE_API_KEY"),
+    api_version=os.getenv("MY_AZURE_API_VERSION"),
     openai_api_type="azure",
-    azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+    azure_deployment=os.getenv("MY_AZURE_DEPLOYMENT_NAME"),
     verbose=True,
 )
 
 # Or use openai's model
 langchain_llm = ChatOpenAI(
-    base_url=os.getenv("OPENAI_API_BASE"),
-    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url=os.getenv("MY_OPENAI_API_BASE"),
+    api_key=os.getenv("MY_OPENAI_API_KEY"),
     model="gpt-4o",
     verbose=True,
 )
@@ -78,6 +82,9 @@ class Chatbot:
         self.tot_generater = RunnableParallel(repair_plan = repair_strategy_chain, replace_plan = replacement_strategy_chain, tradein_plan = tradein_strategy_chain)
 
         self.tot_scorer = plan_selection_prompt | langchain_llm | plan_parser
+
+        # The time aware plan selection chain
+        self.time_aware_plan_selection_chain = time_aware_plan_selection_prompt | langchain_llm | time_aware_plan_parser
         
 
     def update_chat_history(self, user_input: str = "", ai_input: str = ""):
@@ -130,28 +137,65 @@ class Chatbot:
                 self.user_warranty = warranty
 
             information_to_collect = []
+            suggested_question = ""
             if self.broken_places == []:
                 information_to_collect.append("broken parts")
             if self.user_warranty == "unsure":
-                information_to_collect.append("is user's product have warranty")
+                information_to_collect.append("if user's product have warranty")
+                suggested_question = output["warranty"]["Utterance"]
             if information_to_collect != []:
                 question_generation_chain = question_generator_prompt | langchain_llm | question_generator_parser
-                output = question_generation_chain.invoke({
-                    "required_information": information_to_collect
-                })
+                output = question_generation_chain.invoke(
+                    {
+                        "chat_history": self.chat_history,
+                        "required_information": information_to_collect,
+                        "suggested_question": suggested_question,
+                    }
+                )
                 ai_utterance = output["utterance"]
                 self.update_chat_history(user_input=user_input, ai_input=ai_utterance)
                 self.information_collection_turns += 1
                 return ai_utterance
             else:
-                ai_utterance = "I have collected all the information. Let me think about the repairing plan for you. Give me a second."
+                ai_utterance = "I have collected all the information. Let me think about the repairing plan for you. If you want me generate a plan for you, please reply 'Generate a plan'. If you want to end the conversation, please reply 'Exit'."
                 self.update_chat_history(user_input=user_input, ai_input=ai_utterance)
-                self.information_collection_turns += 1
+                self.information_collection_turns += 10 # jump the case to the plan generation
                 
                 return ai_utterance
-                
+        else:
+            if self.information_collection_turns == 3: # This hints the user doesn't provide enough information
+                ai_utterance = "Based on the information you provided, I can generate a rought plan for you. It may take a few seconds. If you want me to generate a plan for you, please reply 'Generate a plan'. If you want to end the conversation, please reply 'Exit'."
+                self.update_chat_history(user_input=user_input, ai_input=ai_utterance)
+                self.information_collection_turns += 10 # jump the case to the plan generation
+                return ai_utterance
 
+            # Tree of thoughts for plan generation
+            # if warranty is still unsure, treat it as no warranty
+            if self.user_warranty.lower() == "unsure":
+                self.user_warranty = "no"
 
+            plan_output = self.tot_generater.invoke(
+                {
+                    "user_input": f"The broken parts of the tablet includes {self.broken_places}",
+                    "additional_info": f"Warranty status: {self.user_warranty}",
+                    # "user_preference": self.user_preference,
+                }
+            )
+            first_layer_plan = self.tot_scorer.invoke(
+                {
+                    "replace_plan": plan_output["replace_plan"]["Utterance"],
+                    "repair_plan": plan_output["repair_plan"]["Utterance"],
+                    "tradein_plan": plan_output["tradein_plan"]["Utterance"],
+                    "user_preference": self.user_preference
+                }
+            )
+            second_layer_plan = get_time_contrain_of_plans(first_layer_plan)
+            final_plan = self.time_aware_plan_selection_chain.invoke(
+                {
+                    "plans": second_layer_plan,
+                }
+            )
+            ai_utterance = final_plan["Utterance"]
 
             self.update_chat_history(user_input=user_input, ai_input=ai_utterance)
             self.information_collection_turns += 1

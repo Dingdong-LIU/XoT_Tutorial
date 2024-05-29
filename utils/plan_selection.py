@@ -21,7 +21,7 @@ class Plan(BaseModel):
 plan_parser = JsonOutputParser(pydantic_object=Plan)
 
 plan_selection_prompt = PromptTemplate.from_template(
-    "Plans to select from: \n Replace: {replace_plan} \n Repair: {repair_plan} \n Trade-in: {tradein_plan} \n Please select one of the plans by considering the total cost and user's preference. Generate a proper response to the user. Note that the price for a new device is 249 USD. Replacement is free of charge if the product is under warranty. User's previous attitude: {user_preference}  \n Analysis: {ai_analysis} \n Selected plan: {selected_plan}\n AI response: {ai_response}",
+    "Plans to select from: \n Replace: {replace_plan} \n Repair: {repair_plan} \n Trade-in: {tradein_plan} \n Please select one of the plans by considering the total cost and user's preference. Generate a proper response to the user. Note that the price for a new device is 249 USD. Replacement, if valid, cost 0 usd. User's previous attitude: {user_preference}  \n Analysis: {ai_analysis} \n Selected plan: {selected_plan}\n AI response: {ai_response}",
 )
 
 plan_selection_fewshot_examples = [

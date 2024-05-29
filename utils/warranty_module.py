@@ -21,21 +21,26 @@ warranty_parser = JsonOutputParser(pydantic_object=Warranty)
 # few shot cot exmaples
 warranty_checker_examples = [
     {
-        "ai_question": "When did you purchase this item?",
         "human_response": "A month ago",
         "ai_response": "Analysis: Let's think step by step. All products come with a 90-day warranty since purchase. A month is within the 90-day time span. The product must have warranty. Warranty: Yes. Utterance: Great! Your product has warranty.",
     },
     {
-        "ai_question": "When did you purchase this item?",
         "human_response": "Last year.",
         "ai_response": "Analysis: Let's think step by step. All products come with a 90-day warranty. A year is more than this time span. However, we are not sure if the user purchased additional warranty. We are not sure if the product has warranty. Warranty: Unsure. Utterance: Did you purchase additional warranty?",
     },
+    {
+        "human_response": "the screen is broken",
+        "ai_response": "Analysis: Let's think step by step. The user didn't provided a time information, we cannot tell if it has warranty. Warranty: Unsure. Utterance: I am sorry to hear that. But I need to know if the product has warranty. Could you provide me the time of purchase?",
+    },
+    {
+        "human_response": "I am not sure",
+        "ai_response": "Analysis: Let's think step by step. The user is unsure about the warranty. Let's ask about when the product is purchased. Warranty: Unsure. Utterance: I am sorry to hear that. But I need to know if the product has warranty. Could you provide me the time of purchase?",
+    }
 ]
 
 # define the a fewshot example format
 warranty_checker_example_template = ChatPromptTemplate.from_messages(
     [
-        ("ai", "{ai_question}"),
         ("human", "{human_response}"),
         ("ai", "{ai_response}"),
     ]

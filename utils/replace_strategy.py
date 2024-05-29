@@ -28,7 +28,7 @@ replacement_strategy_examples = [
     {
         "ai_question": "Which part of the product is broken?",
         "human_response": "The screen and the battery. Additional info: warranty: Yes.",
-        "ai_response": "Analysis: Let's think step by step. The user have a warranty. The product can be replaced free of charge. Replacement: Yes. Utterance: You can get a replacement free of charge for the product as it is under warranty.",
+        "ai_response": "Analysis: Let's think step by step. The user have a warranty. The product can be replaced free of charge. Replacement: Yes. Utterance: You can get a replacement for the product as it is under warranty. The cost is 0 USD.",
     },
 ]
 
