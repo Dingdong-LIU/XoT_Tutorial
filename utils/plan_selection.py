@@ -30,13 +30,14 @@ plan_selection_fewshot_examples = [
         "repair_plan": "The total cost to fix the product is 150 USD.",
         "tradein_plan": "You can get a 100 USD coupon if you want to trade in your old device for a new one.",
         "user_preference": "None",
-        "ai_analysis": "Let's thing step by step. The product cannot be replaced without additional charge. For repair, the cost for fixing the old device is 150 USD. For Trade-in, the cost for a new device is 249 USD, and the user can get a coupon. So he will spend 149 USD for the new device. Therefore, it is better to buy a new device as the cost is almost the same.",
+        "ai_analysis": "Let's thing step by step. The product cannot be replaced without a warranty. For repair, the cost for fixing the old device is 150 USD. For Trade-in, the cost for a new device is 249 USD, and the user can get a coupon. So he will spend 149 USD for the new device. Therefore, it is better to buy a new device as the cost is almost the same.",
         "selected_plan": "Trade-in",
         "ai_response": "Maybe you should consider buying a new device instead of fixing the old one. The cost for fixing the old device is 150 USD, and the cost for a new device is 249 USD. You can get a 100 USD coupon if you want to trade in your old device for a new one. The total cost to fix the product is 150 USD.",
     }
 ]
 
-
+# plan selection strategy: the lower the cost, the better
+# TODO: let student modify this part. to explicitly show the cost of each option. Or change the selection strategy.
 plan_selection_prompt = FewShotPromptTemplate(
     examples=plan_selection_fewshot_examples,
     example_prompt=plan_selection_prompt,

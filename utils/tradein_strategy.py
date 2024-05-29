@@ -17,6 +17,8 @@ class Tradein(BaseModel):
 
 tradein_parser = JsonOutputParser(pydantic_object=Tradein)
 
+# TODO: original: give 100 USD for any trade-in. Let student modify this part. Let student change it to give 50 USD for a major issue and 100 USD for a minor issue. (let student define major and minor issues themselves)
+
 tradein_strategy_examples = [
     {
         "ai_question": "Which part of the product is broken?",

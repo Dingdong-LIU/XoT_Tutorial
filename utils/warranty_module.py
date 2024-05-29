@@ -18,7 +18,7 @@ class Warranty(BaseModel):
 
 warranty_parser = JsonOutputParser(pydantic_object=Warranty)
 
-
+# few shot cot exmaples
 warranty_checker_examples = [
     {
         "ai_question": "When did you purchase this item?",
@@ -32,6 +32,7 @@ warranty_checker_examples = [
     },
 ]
 
+# define the a fewshot example format
 warranty_checker_example_template = ChatPromptTemplate.from_messages(
     [
         ("ai", "{ai_question}"),
@@ -40,6 +41,7 @@ warranty_checker_example_template = ChatPromptTemplate.from_messages(
     ]
 )
 
+# convert to the fewshot example format
 warranty_checker_fewshot_examples = FewShotChatMessagePromptTemplate(
     example_prompt=warranty_checker_example_template,
     examples=warranty_checker_examples,

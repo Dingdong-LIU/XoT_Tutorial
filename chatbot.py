@@ -26,18 +26,18 @@ langchain.debug = False  # set verbose mode to True to show more execution detai
 load_dotenv()
 
 langchain_llm = AzureChatOpenAI(
-    azure_endpoint=os.getenv("HKUST_OPENAI_BASE"),
-    api_key=os.getenv("HKUST_OPENAI_KEY"),
-    api_version=os.getenv("HKUST_OPENAI_API_VERSION"),
+    azure_endpoint=os.getenv("YOUR_AZURE_ENDPOINT"),
+    api_key=os.getenv("AZURE_API_KEY"),
+    api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
     openai_api_type="azure",
-    azure_deployment=os.getenv("HKUST_OPENAI_DEPLOYMENT_NAME"),
+    azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
     verbose=True,
 )
 
 # Or use openai's model
 langchain_llm = ChatOpenAI(
-    base_url=os.getenv("VENDER_BASE_URL"),
-    api_key=os.getenv("VENDER_API_KEY"),
+    base_url=os.getenv("OPENAI_API_BASE"),
+    api_key=os.getenv("OPENAI_API_KEY"),
     model="gpt-4o",
     verbose=True,
 )
