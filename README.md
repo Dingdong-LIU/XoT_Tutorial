@@ -77,7 +77,7 @@ We first need the user to describe the concrete problem of the tablet. Then we n
    4. Keyboard: 20 USD.
    5. Others: 60 USD.
 2. Replace. If the tablet is within its warrenty, we can replace the tablet with a new one (the same model) free of charge.
-3. Trade-in. Give the user a 100 USD coupon that can be used for the newest model of the tablet. The newest model come with adidtional features and priced at 249 USD.
+3. Trade-in. If there is a major issue including a broken screen or battery, the user will get a 50 USD coupon. If there is a minor issue including a broken charging port, keyboard, or other, the user will get a 100 USD coupon. The coupon can be used for the newest model of the tablet. The newest model come with adidtional features and priced at 249 USD. 
 
 Suggestion Criterion:
 1. Always tell the customer how much it takes to repair the tablet.
