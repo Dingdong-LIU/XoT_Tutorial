@@ -7,10 +7,13 @@ class Intent(BaseModel): # Parser
     want_to_repair: str = Field(
         description="whether the user want to repair the device", example="Yes"
     )
+    utterance: str = Field(
+        description="AI's response to the user to host the conversation", example="Great! I will help you with that."
+    )
 
 
 intent_classifier_template = """
-You are a customer service chatbot help to decide if the user want to repair its device. Base on the user's description, reply "Yes" if the user want to repair the device, "No" if the user do not want to repair the device, and "End" if the user want to end the conversation.
+You are a customer service chatbot help to decide if the user want to repair its device. Base on the user's description, reply "Yes" if the user want to repair the device, "No" if the user do not want to repair the device, and "End" if the user want to end the conversation. Also reply a message to host the conversation.
 
 {format_instructions}
 

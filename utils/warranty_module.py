@@ -49,7 +49,7 @@ warranty_checker_fewshot_examples = FewShotChatMessagePromptTemplate(
 warranty_checker_prompt = ChatPromptTemplate.from_messages(
     [
         SystemMessage(
-            content="You are a helpful agent that help to decide if a product is out of warranty. Note that all product come with a 90-day warranty since purchase. Customer can also purchase additional warranty that extends it to 2 years. Today is May 20th, 2024."
+            content="You are a helpful agent that help to decide if a product is out of warranty. Note that all product come with a 90-day warranty since purchase. Customer can also purchase additional warranty that extends it to 2 years. Today is May 20th, 2024. Reply if the product has warranty or not. If the product has warranty, reply 'Yes'. If the product does not have warranty, reply 'No'. If you are unsure, reply 'Unsure'."
         ),
         warranty_checker_fewshot_examples,
         HumanMessagePromptTemplate(
