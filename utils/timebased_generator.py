@@ -8,7 +8,7 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 
 
 def get_time_contrain_of_plans(plan: dict):
-    if not "Plan" in plan:
+    if "Plan" not in plan:
         plan["Time"] = "unknown"
         return plan
     if plan["Plan"].lower() == "repair":
