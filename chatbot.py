@@ -67,7 +67,7 @@ class Chatbot:
         self.user_preference_chain = preference_identifier_prompt | langchain_llm | preference_identifier_parser
 
         # The chains for intent classification
-        self.intent_classifier_chain_all = RunnableParallel(
+        self.intent_preference_chain = RunnableParallel(
             service_intent = self.intent_classifier_chain,
             user_preference = self.user_preference_chain,
         )
@@ -94,31 +94,44 @@ class Chatbot:
         })
         self.conversation_turn += 1
 
-    def repair_plan_generation(self):
-        pass
+
 
     def interact(self, user_input = ""):
         if self.conversation_turn == 0:
+            # This is the first turn of the conversation, just greet the user
             self.update_chat_history(user_input=user_input, ai_input=self.greeting)
             return self.greeting
         
-        output = self.intent_classifier_chain_all.invoke({
+        # First check the intent of the user, and
+        # Collect user's preference at the same time
+        self.intent_preference_chain = RunnableParallel(
+            service_intent=self.intent_classifier_chain,
+            user_preference=self.user_preference_chain,
+        )
+        output = self.intent_preference_chain.invoke({
             "user_input": user_input
         })
         service_intent = output["service_intent"]["want_to_repair"]
         ai_utterance = output["service_intent"]["utterance"]
         self.user_preference = output["user_preference"]["user_preference"]
+
+        # Check if the user wants to end the conversation or not
         if service_intent.lower() == "end":
             self.update_chat_history(user_input=user_input, ai_input=ai_utterance)
             return ai_utterance
         
-        # If the user does not want to end the conversation, try to find out technical infomation.
+        # If the user does not want to end the conversation, try to find out technical infomation and warranty information
+        # Current design: Set a counter `self.information_collection_turns`, to make sure that if the user doesn't provide enough information, the `tech issue` and `warranty` node will self iterate at most 2 times.
+        # TODO: Exercise: Could you change the design to a more flexible strategy? Try your own design.
+
         if self.information_collection_turns == 0:
+            # This is the case that the chatbot haven't asked for any information
             ai_utterance = "Could you please provide me more information about the issue of your tablet? And when did you purchased this item?"
             self.update_chat_history(user_input=user_input, ai_input=ai_utterance)
             self.information_collection_turns += 1
             return ai_utterance
-        elif self.information_collection_turns <= 2:
+        elif self.information_collection_turns <= 2: 
+            # Make sure do not stick in the information collection loop
             tech_issue_warranty_chain = RunnableParallel(
                 tech_issue = self.tech_issue_analyser_chain,
                 warranty = self.warranty_checker_chain,
@@ -136,6 +149,7 @@ class Chatbot:
             if warranty.lower() != "unsure":
                 self.user_warranty = warranty
 
+            # Find out if there is any information missing
             information_to_collect = []
             suggested_question = ""
             if self.broken_places == []:
@@ -144,6 +158,7 @@ class Chatbot:
                 information_to_collect.append("if user's product have warranty")
                 suggested_question = output["warranty"]["Utterance"]
             if information_to_collect != []:
+                # Generate a question to ask the user
                 question_generation_chain = question_generator_prompt | langchain_llm | question_generator_parser
                 output = question_generation_chain.invoke(
                     {
@@ -159,14 +174,16 @@ class Chatbot:
             else:
                 ai_utterance = "I have collected all the information. Let me think about the repairing plan for you. If you want me generate a plan for you, please reply 'Generate a plan'. If you want to end the conversation, please reply 'Exit'."
                 self.update_chat_history(user_input=user_input, ai_input=ai_utterance)
-                self.information_collection_turns += 10 # jump the case to the plan generation
+                # jump to the plan generation
+                self.information_collection_turns += 10 
                 
                 return ai_utterance
         else:
             if self.information_collection_turns == 3: # This hints the user doesn't provide enough information
                 ai_utterance = "Based on the information you provided, I can generate a rought plan for you. It may take a few seconds. If you want me to generate a plan for you, please reply 'Generate a plan'. If you want to end the conversation, please reply 'Exit'."
                 self.update_chat_history(user_input=user_input, ai_input=ai_utterance)
-                self.information_collection_turns += 10 # jump the case to the plan generation
+                # jump to the plan generation
+                self.information_collection_turns += 10 
                 return ai_utterance
 
             # Tree of thoughts for plan generation

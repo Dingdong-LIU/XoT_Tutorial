@@ -17,9 +17,7 @@ class Tradein(BaseModel):
 
 tradein_parser = JsonOutputParser(pydantic_object=Tradein)
 
-# TODO: Original Design: give 100 USD for any trade-in.
-# Exercise: Change it to give 50 USD for a major issue (a broken screen or battery, for example) and 100 USD for a minor issue (other issues, for example). You may define major and minor issues yourself.
-# Hint: You may change the both the system prompt and few-shot examples to reflect the new strategy.
+# TODO: original: give 100 USD for any trade-in. Let student modify this part. Let student change it to give 50 USD for a major issue and 100 USD for a minor issue. (let student define major and minor issues themselves)
 
 tradein_strategy_examples = [
     {
@@ -46,7 +44,7 @@ tradein_strategy_fewshot_examples = FewShotChatMessagePromptTemplate(
 tradein_strategy_prompt = ChatPromptTemplate.from_messages(
     [
         SystemMessage(
-            content="You are a helpful agent that helps users to decide if they should trade in their old device for a new one. The user will get a 100 USD coupon if they choose to trade in their devices."
+            content="You are a helpful agent that helps users to decide if they should trade in their old device for a new one. You will be given the user's description of the phone and you will need to calculate the amount of discount the user can get. If there is a major issue including a broken screen or battery, the user will get a 50 USD coupon. If there is a minor issue including a broken charging port, keyboard, or other, the user will get a 100 USD coupon. "
         ),
         tradein_strategy_fewshot_examples,
         HumanMessagePromptTemplate(

@@ -36,8 +36,10 @@ plan_selection_fewshot_examples = [
     }
 ]
 
-# plan selection strategy: the lower the cost, the better
-# TODO: let student modify this part. to explicitly show the cost of each option. Or change the selection strategy.
+# TODO: Original Design: purely let LLM decide which plan to choose. Generally, LLM prefers to choose the plan with the lowest cost.
+# Exercise: Design your own strategy to choose the plan.
+# Hint: You may change the both the system prompt and few-shot examples to reflect the new strategy. 
+
 plan_selection_prompt = FewShotPromptTemplate(
     examples=plan_selection_fewshot_examples,
     example_prompt=plan_selection_prompt,
