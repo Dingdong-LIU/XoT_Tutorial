@@ -1,8 +1,8 @@
 # XoT_Tutorial
-A brief tutorial on Chain of Thoughts (CoT), Tree of Thoughts (CoT) and Graph of Thoughts (GoT) based on my own understandings.
+A brief tutorial on Chain of Thoughts (CoT), Tree of Thoughts (CoT) and Graph of Thoughts (GoT).
 
 ## Scenario
-Try to use a customer service scenario. The agent need to help the customer make a decision on whether to repair its device. This is not an easy task as the repairing fee could be high. If the repairing fee is close to buying a new one, trade-in the broken one and get a coupon might be a good choice.
+Under the customer service scenario, an agent need to help the customer make suggestion to the user on whether to repair its device. This is not an easy task as the repairing fee could be high. If the repairing fee is close to buying a new one, trade-in the broken one and get a coupon might be a good choice.
 
 To be specific, the agent need to figure out:
 * Does the customer want to repair its device?
@@ -10,6 +10,7 @@ To be specific, the agent need to figure out:
   * Repair the device, and pay the repairing fee.
   * Trade-in the device, and get a coupon for a brand new one.
 * Note that the customer may purchased warrenty, which could significantly reduce the fee for a repair. That makes the decision making more complex.
+* Besides, there are in-stock and out-of-stock items. The in-stock item can be picked up immediately, while the out-of-stock item need to be shipped and the user need to wait for a few days.
 
 ### Settings of the Customer Tutorial
 
@@ -30,10 +31,10 @@ We will try to use different prompting strategies in different steps.
 
 LLMs may directly handle the user intent part, i.e., it may distinguish whether the user is would like to comment on the current product or would like to request for "after-sales service".
 
-May consider the following prompt:
+May consider designing a proper prompt for the LLMs to handle the user intent part. See `utils/intent_classifier.py` for implementation details.
 
 
-> You are a customer service chatbot help to decide if the user want to repair its device. Base on the user's description, reply "Yes" if the user want to repair the device, "No" if the user do not want to repair the device, and "End" if the user want to end the conversation. 
+<!-- > You are a customer service chatbot help to decide if the user want to repair its device. Base on the user's description, reply "Yes" if the user want to repair the device, "No" if the user do not want to repair the device, and "End" if the user want to end the conversation.  -->
 
 
 ## Chain of Thoughts (CoT)
@@ -43,31 +44,20 @@ Checking warranty coverage is more complex compared with checking intent. Basica
 2. Customers can purchase additional warranty up to 2 years with an additional price. 
 
 
-May consider the chain-of-though prompting, with background and fewshot examples:
+<!-- May consider the chain-of-though prompting, with background and fewshot examples:
 
 #### Background: 
 > You are a helpful agent that help to decide if a product is out of warranty. Note that all product come with a 90-day warranty since purchase. Customer can also purchase additional warranty that extends it to 2 years. Today is May 20th, 2024.
 
-#### Warranty Checking Fewshot Examples
+#### Warranty Checking Fewshot Examples -->
 
-Fewshot examples:
-> Question: When did you purchase this item?
-> 
-> Reply: A month ago.
-> Analysis: Let's think step by step. All products come with a 90-day warranty. A month is within the 90-day time span. The product must have warranty.
-> Warranty: Yes.
-> Utterance: Great! Your product has warranty.
+Practice CoT with fewshot examples. See the `utils/warranty_module.py` for implementation details.
 
-> Question: When did you purchase this item?
-> 
-> Reply: Last year.
-> Analysis: Let's think step by step. All products come with a 90-day warranty. A year is more than this time span. However, we are not sure if the user purchased additional warranty. We are not sure if the product has warranty.
-> Warranty: Unsure.
-> Utterance: Did you purchase additional warranty?
 
-## Tree of Thoughts (ToT)
+## Self-consistent Tree of Thoughts (CoT-SC)
 
 <!-- Multi-rounds of interaction. As user may also complain about the product at the same time when trying to get customer service, it would be great to collect user feedback at the same time. -->
+![](doc/figs/XoT_Tutorial_Diagrams-CoT-SC.svg) 
 
 We first need the user to describe the concrete problem of the tablet. Then we need to find out the best suggestion for the user:
 1. Repair. The price for repairing each part of the tablet is:
@@ -76,16 +66,31 @@ We first need the user to describe the concrete problem of the tablet. Then we n
    3. Battery: 30 USD.
    4. Keyboard: 20 USD.
    5. Others: 60 USD.
-2. Replace. If the tablet is within its warrenty, we can replace the tablet with a new one (the same model) free of charge.
-3. Trade-in. If there is a major issue including a broken screen or battery, the user will get a 50 USD coupon. If there is a minor issue including a broken charging port, keyboard, or other, the user will get a 100 USD coupon. The coupon can be used for the newest model of the tablet. The newest model come with adidtional features and priced at 249 USD. 
+2. Replace. If the tablet is within its warrenty, we can replace the tablet with a new one for free.
+3. Trade-in. Give user an 100 USD coupon for a new tablet if the user trade-in the broken tablet.
 
-Suggestion Criterion:
-1. Always tell the customer how much it takes to repair the tablet.
-2. If the price difference between repair and trade-in is less than 20 USD, suggest the user to trade-in the broken tablet and buy a new one.
+> **Exercise**: *Change the Trade-in plan criterion. Give 50 USD coupon for major issue and 100 USD coupon for minor issue, if the user trade-in the broken tablet.*
+
+Selection Criterion:
+1. Ask LLM to decide.
+
+> **Exercise**: *Change the selection criterion. Design your own selection criterion.*
+
+## Tree of Thoughts (ToT)
+
+Plan generation with ToT. This time we also need to consider the time cost of each plan.
+
+We set up different time cost for in-stock and out-of-stock items. The in-stock item (space grey model) can be picked up immediately, while the out-of-stock item (black model) need to be shipped and the user need to wait for 7 days.
+
+
+![](doc/figs/XoT_Tutorial_Diagrams-ToT.svg)
+
 
 ## Graph of Thoughts (GoT)
 
-Allow jumping steps and collect information from the beginning. Using following graph architecture:
+Reusing previous chains and add two more chains for the user to decide whether to repair the device and what to do if the device is out of warranty.
 
 
-![](doc/figs/XoT_Tutorial_Diagrams-graph_of_thoughts.svg)
+![](doc/figs/XoT_Tutorial_Diagrams-GoT.svg)
+
+> **Exercise**: *Currently the `Tech issue` and `Warranty` node only self-iterate twice. Try to use your own self-iteration strategy.*
