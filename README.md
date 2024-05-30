@@ -43,7 +43,7 @@ In this tutorial, we will be using the OpenAI API to interact with the GPT-4 mod
 
 First, create an [OpenAI account](https://platform.openai.com/signup) or [sign in](https://platform.openai.com/login). Next, navigate to the [API key page](https://platform.openai.com/account/api-keys) and "Create new secret key", optionally naming the key. Make sure to save this somewhere safe and do not share it with anyone.
 
-If your organization has subscription to the Azure OpenAI API, you can use that API key as well.
+If your organization has a subscription to the Azure OpenAI API, you can use that API key as well.
 
 ## Create an Environment File to Save Your API Key Safely in the Tutorial Directory
 
@@ -67,4 +67,7 @@ You can run the first part of `XoT_Tutorial.ipynb`, "Prepare your OpenAI GPT Mod
 
 ## Running the Notebooks
 
-We recommend using Vscode to run the notebooks. You can install the Python and Jupyter extension pack in Vscode and open the notebooks in the editor. You can then run the notebooks cell by cell.
+We recommend using Visual Studio Code (vscode) to run the notebooks. You can install the Python and Jupyter extension pack in vscode and open the notebooks in the editor. You can then run the notebooks cell by cell.
+
+* You will find a guide 👉 [here](https://code.visualstudio.com/docs/setup/setup-overview#_cross-platform) on how to install Visual Studio Code on your computer. You may need to follow the guide for your operating system.
+* You will find a guide 👉 [here](https://code.visualstudio.com/docs/python/jupyter-support) on how to install the Python and Jupyter extension pack in vscode.
