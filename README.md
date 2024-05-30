@@ -9,7 +9,7 @@
 ### Creating a Conda Environment with Specified Packages:
 1. To create a new Conda environment, open a new command prompt or terminal and use the following command:
     ```sh
-    conda env create -f environment.yml --name xot_tutorial
+    conda env create -f requirements.yml --name xot_tutorial
     ```
     Replace "xot_tutorial" with your desired environment name. This command will automatically install all the packages required for the tutorial in a new Conda environment. Once the installation is complete, you can proceed to the next step.
 
