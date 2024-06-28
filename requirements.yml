@@ -1,8 +1,15 @@
 name: xot_tutorial
 channels:
+  - conda-forge
   - defaults
 dependencies:
-  - python
+  - python=3.11
   - langchain
   - jupyter
   - python-dotenv
+  - matplotlib
+  - networkx
+  - pip
+  - pip:
+      - langchain-openai==0.1.7
+      - langchain-community==0.2.6
